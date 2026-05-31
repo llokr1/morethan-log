@@ -4,7 +4,7 @@ const CONFIG = {
     name: "홍진기",
     image: "/avatar.svg", // If you want to create your own notion avatar, check out https://notion-avatar.vercel.app
     role: "Gachon University Student",
-    bio: "컴퓨터공학과를 전공하고 있는 학생입니다.",
+    bio: "학습 내용 기록 블로그",
     email: "ghdwlsrl100@gachon.ac.kr",
     linkedin: "llokr",
     github: "llokr1",
@@ -15,7 +15,7 @@ const CONFIG = {
   blog: {
     title: "홍진기의 블로그",
     description: "학습 과정, 문제 해결 과정을 정리하는 공간",
-    scheme: "dark", // 'light' | 'dark' | 'system'
+    scheme: "light", // 'light' | 'dark' | 'system'
   },
 
   // CONFIG configration (required)

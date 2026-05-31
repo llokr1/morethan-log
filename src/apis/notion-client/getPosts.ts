@@ -17,18 +17,32 @@ export const getPosts = async () => {
 
   const response = await api.getPage(id)
   id = idToUuid(id)
+  const blockData = (response.block[id]?.value as any)?.value ?? response.block[id]?.value
   const collectionValue = Object.values(response.collection)[0]?.value as any
   const collection = collectionValue?.value ?? collectionValue
+
+  // getPage skips the root collection_view_page block when querying collections.
+  // Manually fetch collection data if collection_query is empty.
+  if (Object.keys(response.collection_query).length === 0) {
+    const collectionId = Object.keys(response.collection)[0]
+    const viewId = blockData?.view_ids?.[0]
+    if (collectionId && viewId) {
+      const collectionView = (response.collection_view?.[viewId] as any)?.value
+      const extra = await api.getCollectionData(collectionId, viewId, collectionView, { limit: 999 })
+      response.collection_query[collectionId] = {
+        ...response.collection_query[collectionId],
+        [viewId]: (extra.result as any)?.reducerResults,
+      }
+      Object.assign(response.block, extra.recordMap?.block)
+    }
+  }
   const block = response.block
   const schema = collection?.schema
 
-  const blockValue = (block[id].value as any)?.value ?? block[id].value
-  const rawMetadata = blockValue
-
   // Check Type
   if (
-    rawMetadata?.type !== "collection_view_page" &&
-    rawMetadata?.type !== "collection_view"
+    blockData?.type !== "collection_view_page" &&
+    blockData?.type !== "collection_view"
   ) {
     return []
   } else {
