@@ -28,7 +28,7 @@ async function getPageProperties(
             const newurl = customMapImageUrl(url, Block)
             properties[schema[key].name] = newurl
           } catch (error) {
-            properties[schema[key].name] = undefined
+            properties[schema[key].name] = null
           }
           break
         }
