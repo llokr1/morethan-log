@@ -53,25 +53,30 @@ async function getPageProperties(
           break
         }
         case "person": {
-          const rawUsers = val.flat()
-
           const users = []
-          for (let i = 0; i < rawUsers.length; i++) {
-            if (rawUsers[i][0][1]) {
-              const userId = rawUsers[i][0]
-              const res: any = await api.getUsers(userId)
-              const resValue =
-                res?.recordMapWithRoles?.notion_user?.[userId[1]]?.value
-              const user = {
-                id: resValue?.id ?? null,
-                name:
-                  resValue?.name ||
-                  `${resValue?.family_name}${resValue?.given_name}` ||
-                  null,
-                profile_photo: resValue?.profile_photo || null,
-              }
-              users.push(user)
+          for (const segment of val) {
+            // Person property format: ["‣", [["u", "user-uuid"]]]
+            if (!Array.isArray(segment) || segment[0] !== "‣") continue
+            const annotations: any[] = segment[1]
+            if (!Array.isArray(annotations)) continue
+            const userAnnotation = annotations.find((a: any) => a[0] === "u")
+            const userUuid = userAnnotation?.[1]
+            if (!userUuid) continue
+
+            const res: any = await api.getUsers([userUuid])
+            // getRecordValues returns { results: [{ value: {...} }] }
+            const raw = res?.results?.[0]?.value
+            const resValue = raw?.value ?? raw
+
+            const user = {
+              id: resValue?.id ?? null,
+              name:
+                resValue?.name ||
+                `${resValue?.family_name ?? ""}${resValue?.given_name ?? ""}` ||
+                null,
+              profile_photo: resValue?.profile_photo || null,
             }
+            users.push(user)
           }
           properties[schema[key].name] = users
           break
