@@ -5,6 +5,7 @@ import { FeedHeader } from "./FeedHeader"
 import Footer from "./Footer"
 import styled from "@emotion/styled"
 import TagList from "./TagList"
+import CategoryList from "./CategoryList"
 import MobileProfileCard from "./MobileProfileCard"
 import ProfileCard from "./ProfileCard"
 import ServiceCard from "./ServiceCard"
@@ -27,6 +28,7 @@ const Feed: React.FC<Props> = () => {
           height: `calc(100vh - ${HEADER_HEIGHT}px)`,
         }}
       >
+        <CategoryList />
         <TagList />
       </div>
       <div className="mid">
@@ -34,6 +36,7 @@ const Feed: React.FC<Props> = () => {
         <PinnedPosts q={q} />
         <SearchInput value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="tags">
+          <CategoryList />
           <TagList />
         </div>
         <FeedHeader />
