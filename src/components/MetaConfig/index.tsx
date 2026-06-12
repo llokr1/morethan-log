@@ -11,21 +11,44 @@ export type MetaConfigProps = {
 }
 
 const MetaConfig: React.FC<MetaConfigProps> = (props) => {
+  const isHomepage = props.type === "website" || props.type === "Website"
+  const pageTitle = isHomepage
+    ? props.title
+    : `${props.title} | ${CONFIG.blog.title}`
+
+  const jsonLd =
+    props.type === "Post"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: props.title,
+          description: props.description,
+          url: props.url,
+          datePublished: props.date,
+          author: {
+            "@type": "Person",
+            name: CONFIG.profile.name,
+          },
+          ...(props.image && { image: props.image }),
+        }
+      : null
+
   return (
     <Head>
-      <title>{props.title}</title>
+      <title>{pageTitle}</title>
+      <link rel="canonical" href={props.url} />
       <meta name="robots" content="follow, index" />
       <meta charSet="UTF-8" />
       <meta name="description" content={props.description} />
       {/* og */}
       <meta property="og:type" content={props.type} />
-      <meta property="og:title" content={props.title} />
+      <meta property="og:title" content={pageTitle} />
       <meta property="og:description" content={props.description} />
       <meta property="og:url" content={props.url} />
       {CONFIG.lang && <meta property="og:locale" content={CONFIG.lang} />}
       {props.image && <meta property="og:image" content={props.image} />}
       {/* twitter */}
-      <meta name="twitter:title" content={props.title} />
+      <meta name="twitter:title" content={pageTitle} />
       <meta name="twitter:description" content={props.description} />
       <meta name="twitter:card" content="summary_large_image" />
       {props.image && <meta name="twitter:image" content={props.image} />}
@@ -35,6 +58,13 @@ const MetaConfig: React.FC<MetaConfigProps> = (props) => {
           <meta property="article:published_time" content={props.date} />
           <meta property="article:author" content={CONFIG.profile.name} />
         </>
+      )}
+      {/* json-ld */}
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       )}
     </Head>
   )

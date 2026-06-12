@@ -14,7 +14,7 @@ const CONFIG = {
   // blog setting (required)
   blog: {
     title: "홍진기의 블로그",
-    description: "학습 과정, 문제 해결 과정을 정리하는 공간",
+    description: "학습 내용 기록 블로그",
     scheme: "light", // 'light' | 'dark' | 'system'
   },
 
