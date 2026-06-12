@@ -20,6 +20,7 @@ export type TPost = {
   date: { start_date: string }
   type: TPostType[]
   slug: string
+  lang?: "ko" | "en"
   tags?: string[]
   category?: string[]
   summary?: string

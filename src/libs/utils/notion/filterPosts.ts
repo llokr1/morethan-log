@@ -3,6 +3,7 @@ import { TPosts, TPostStatus, TPostType } from "src/types"
 export type FilterPostsOptions = {
   acceptStatus?: TPostStatus[]
   acceptType?: TPostType[]
+  lang?: "ko" | "en"
 }
 
 const initialOption: FilterPostsOptions = {
@@ -18,7 +19,7 @@ export function filterPosts(
   posts: TPosts,
   options: FilterPostsOptions = initialOption
 ) {
-  const { acceptStatus = ["Public"], acceptType = ["Post"] } = options
+  const { acceptStatus = ["Public"], acceptType = ["Post"], lang } = options
   const filteredPosts = posts
     // filter data
     .filter((post) => {
@@ -35,6 +36,12 @@ export function filterPosts(
     .filter((post) => {
       const postType = post.type[0]
       return acceptType.includes(postType)
+    })
+    // filter lang: lang 미설정 포스트는 ko로 취급
+    .filter((post) => {
+      if (!lang) return true
+      if (lang === "ko") return !post.lang || post.lang === "ko"
+      return post.lang === lang
     })
   return filteredPosts
 }

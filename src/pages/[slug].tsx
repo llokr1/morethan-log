@@ -18,30 +18,39 @@ const filter: FilterPostsOptions = {
 }
 
 export const getStaticPaths = async () => {
-  const posts = await getPosts()
-  const filteredPost = filterPosts(posts, filter)
+  const allPosts = await getPosts()
 
   return {
-    paths: filteredPost.map((row) => `/${row.slug}`),
+    paths: [
+      ...filterPosts(allPosts, { ...filter, lang: "ko" }).map((row) => ({
+        params: { slug: row.slug },
+        locale: "ko",
+      })),
+      ...filterPosts(allPosts, { ...filter, lang: "en" }).map((row) => ({
+        params: { slug: row.slug },
+        locale: "en",
+      })),
+    ],
     fallback: true,
   }
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  const locale = (context.locale || "ko") as "ko" | "en"
   const slug = context.params?.slug
 
-  const posts = await getPosts()
-  const feedPosts = filterPosts(posts)
-  await queryClient.prefetchQuery(queryKey.posts(), () => feedPosts)
+  const allPosts = await getPosts()
+  const feedPosts = filterPosts(allPosts, { lang: locale })
+  await queryClient.prefetchQuery(queryKey.posts(locale), () => feedPosts)
 
-  const detailPosts = filterPosts(posts, filter)
+  const detailPosts = filterPosts(allPosts, { ...filter, lang: locale })
   const postDetail = detailPosts.find((t: any) => t.slug === slug)
   const recordMap = await getRecordMap(postDetail?.id!)
 
-  await queryClient.prefetchQuery(queryKey.post(`${slug}`), () => ({
-    ...postDetail,
-    recordMap,
-  }))
+  await queryClient.prefetchQuery(
+    queryKey.post(`${slug}`, locale),
+    () => ({ ...postDetail, recordMap })
+  )
 
   return {
     props: {

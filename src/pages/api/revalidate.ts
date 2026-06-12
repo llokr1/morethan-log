@@ -18,10 +18,14 @@ export default async function handler(
       await res.revalidate(path)
     } else {
       const posts = await getPosts()
-      const revalidateRequests = posts.map((row) =>
-        res.revalidate(`/${row.slug}`)
-      )
-      await Promise.all(revalidateRequests)
+      await Promise.all([
+        ...posts
+          .filter((p) => !p.lang || p.lang === "ko")
+          .map((row) => res.revalidate(`/${row.slug}`)),
+        ...posts
+          .filter((p) => p.lang === "en")
+          .map((row) => res.revalidate(`/en/${row.slug}`)),
+      ])
     }
 
     res.json({ revalidated: true })

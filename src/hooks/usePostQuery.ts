@@ -7,7 +7,7 @@ const usePostQuery = () => {
   const router = useRouter()
   const { slug } = router.query
   const { data } = useQuery<PostDetail>({
-    queryKey: queryKey.post(`${slug}`),
+    queryKey: queryKey.post(`${slug}`, router.locale || "ko"),
     enabled: false,
   })
 
