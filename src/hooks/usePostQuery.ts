@@ -4,10 +4,10 @@ import { queryKey } from "src/constants/queryKey"
 import { PostDetail } from "src/types"
 
 const usePostQuery = () => {
-  const router = useRouter()
-  const { slug } = router.query
+  const { query } = useRouter()
+  const { slug } = query
   const { data } = useQuery<PostDetail>({
-    queryKey: queryKey.post(`${slug}`, router.locale || "ko"),
+    queryKey: queryKey.post(`${slug}`),
     enabled: false,
   })
 

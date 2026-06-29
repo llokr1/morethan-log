@@ -21,34 +21,26 @@ export const getStaticPaths = async () => {
   const allPosts = await getPosts()
 
   return {
-    paths: [
-      ...filterPosts(allPosts, { ...filter, lang: "ko" }).map((row) => ({
-        params: { slug: row.slug },
-        locale: "ko",
-      })),
-      ...filterPosts(allPosts, { ...filter, lang: "en" }).map((row) => ({
-        params: { slug: row.slug },
-        locale: "en",
-      })),
-    ],
+    paths: filterPosts(allPosts, filter).map((row) => ({
+      params: { slug: row.slug },
+    })),
     fallback: true,
   }
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const locale = (context.locale || "ko") as "ko" | "en"
   const slug = context.params?.slug
 
   const allPosts = await getPosts()
-  const feedPosts = filterPosts(allPosts, { lang: locale })
-  await queryClient.prefetchQuery(queryKey.posts(locale), () => feedPosts)
+  const feedPosts = filterPosts(allPosts)
+  await queryClient.prefetchQuery(queryKey.posts(), () => feedPosts)
 
-  const detailPosts = filterPosts(allPosts, { ...filter, lang: locale })
+  const detailPosts = filterPosts(allPosts, filter)
   const postDetail = detailPosts.find((t: any) => t.slug === slug)
   const recordMap = await getRecordMap(postDetail?.id!)
 
   await queryClient.prefetchQuery(
-    queryKey.post(`${slug}`, locale),
+    queryKey.post(`${slug}`),
     () => ({ ...postDetail, recordMap })
   )
 
