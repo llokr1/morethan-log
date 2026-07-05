@@ -90,4 +90,7 @@ const StyledWrapper = styled.div`
   .notion-list {
     width: 100%;
   }
+  .notion-quote {
+    font-size: 0.9em;
+  }
 `
